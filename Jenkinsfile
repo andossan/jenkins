@@ -2,39 +2,34 @@ pipeline {
     agent any
 
     stages {
-
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/SEU_USUARIO/SEU_REPO.git'
+                git url: 'https://github.com/andossan/jenkins.git',
+                    branch: 'main',
+                    credentialsId: 'github-token'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    echo "🔧 Construindo imagem Docker..."
-                    docker compose build
-                '''
+                sh 'docker-compose build'
             }
         }
 
         stage('Deploy') {
             steps {
-                sh '''
-                    echo "🚀 Subindo containers..."
-                    docker compose down
-                    docker compose up -d
-                '''
+                sh 'docker-compose down'
+                sh 'docker-compose up -d'
             }
         }
     }
 
     post {
-        success {
-            echo "✔ Deploy concluído com sucesso!"
-        }
         failure {
             echo "❌ Falha no pipeline!"
+        }
+        success {
+            echo "✅ Deploy concluído com sucesso!"
         }
     }
 }
